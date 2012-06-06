@@ -1,0 +1,5 @@
+the opt script changes the permissions of all files to be accessible by everyone and makes a backup of the directory in the backups folder.
+
+running make will compile the xytable program.
+
+directory stable/ holds a stable copy of the program

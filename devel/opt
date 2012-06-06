@@ -1,0 +1,42 @@
+#!/bin/bash
+# Chris Cornelius, May 2011
+
+## A script to clean up and optimize the directory it is in to allow
+## public and outside access (for the LP Final Project with Mike and Nicolas).
+
+echo "Changing all files in "$PWD" to rw_rw_rw ..."
+chmod -f ugo+rw $PWD/*
+
+echo "Restoring "$PWD"/stable to r_xr_xr_x ..."
+chmod -f ugo=rx $PWD/stable
+
+echo "Removing temporary files ..."
+rm -f *~
+make clean
+
+date=`date +%Y_%m_%d_%H_%M`
+backupdir=$PWD/backups/$date
+
+# make ./backups if we need
+if !([ -d $PWD/backups ])
+then
+    echo "Making "$PWD"/backups/ ..."
+    mkdir $PWD/backups
+fi
+
+# make ./backups/$date if we need
+if !([ -d $backupdir ])
+then
+    echo "Creating new backup directory ..."
+    mkdir $backupdir
+fi
+
+# make the backup by copying all files except the backups folder
+echo "Copying backups ..."
+allfiles=`ls *[^backups]*`
+cp $allfiles $backupdir && echo "Done!  File listing to follow."   # copy all the files
+echo $allfiles > $backupdir/backedUp.txt # make a manifest of copied files
+
+ls -l #--color
+echo
+echo

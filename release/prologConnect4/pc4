@@ -1,0 +1,61 @@
+#!/bin/bash
+#########################################################################
+## pc4 -- a wrapper script to run prolog connect 4 predicates from the ##
+##            command line.  Works by consulting the file in gprolog.  ##
+#########################################################################
+
+echo "Prolog Connect 4 Launcher opened..."
+
+
+# get the size of the terminal
+termCols=`stty size | cut -d" " -f2`
+termRows=`stty size | cut -d" " -f1`
+
+echo "Terminal size is "$termCols"x"$termRows
+
+## The source code path of our program
+sourceFile=$PWD/c.pl
+
+## the default goal for gprolog launching
+prologGoal=$"asserta(termCols($termCols)),asserta(termRows($termRows)),consult('$sourceFile'),clearScreen,play,halt"
+
+######################################################################################
+## parse the arguments
+######################################################################################
+if [ $# -gt 0 ]  ## do we have any args?
+then
+    if [ $1 == "--color-disable" ]  ## is arg1 a color disable command?
+    then
+	echo "Color use in terminal disabled"
+	prologGoal=$"asserta(colorEnable(0)),asserta(termCols($termCols)),asserta(termRows($termRows)),consult('$sourceFile'),clearScreen,play,halt"
+    else
+	if [ $1 == "-C" ]  ## is arg1 a color disable command?
+	then
+	    echo "Color use in terminal disabled"
+	    prologGoal=$"asserta(colorEnable(0)),asserta(termCols($termCols)),asserta(termRows($termRows)),consult('$sourceFile'),clearScreen,play,halt"
+	fi
+    fi
+fi
+
+
+
+################################################################################
+## check for the existance of the source file
+################################################################################
+if !([ -f $sourceFile ])
+then
+	echo "pc4: Required file "$filepath" not found."
+	echo "     You cannot play Prolog Connect 4 without this file."
+	exit -1
+fi
+
+## assert: file $sourceFile exists
+
+#echo "Calling Prolog with goal "$prologGoal
+echo "Launching gprolog."
+
+################################################################################
+## call gprolog with the goal spec'd above
+## --init-goal option executes the goal before opening the interpreter
+################################################################################
+gprolog --init-goal $prologGoal
